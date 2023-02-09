@@ -17,7 +17,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<title>시간대별 상태 로그 카운트</title>
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-		<link rel="stylesheet" type="text/css" href="/shkim/style.css" />
+		<link rel="stylesheet" type="text/css" href="/shkim/project/css/style.css" />
 		<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 		<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 		<script>
