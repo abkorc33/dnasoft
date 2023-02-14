@@ -174,7 +174,7 @@
                 <td>".$last_date."</td>
                 <td>".$ad_balance."</td>
                 <td>".$uname."</td>
-                <td>상세보기</td></tr>";
+                <td>".$uteam.'-'.$m_upart."</td></tr>";
     }
 
     //	[ 조건에 해당하는 데이터가 없을 경우 ] ============
