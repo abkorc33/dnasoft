@@ -57,8 +57,8 @@ h1 a{
 	color: gray;
 	margin-left: 20px;
 }
-hr{
-	width: 1120px;
+.manage{
+	width: 1200px;
 	border: solid 1px powderblue;
 	margin-left:20px;
 }
@@ -81,4 +81,11 @@ li a{
 .color{
 	background: #accfff;
 	color: white;
+}
+.dsp{
+	color: blue;
+}
+.modal_hr{
+	width: 450px;
+	border: solid 1px powderblue;
 }
