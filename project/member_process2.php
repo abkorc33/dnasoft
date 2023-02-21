@@ -2,7 +2,7 @@
 	// 프로그램명	: member_db.php
 	// 제목		: 회원 관리 테스트페이지
 	// 작성자		: 김수현
-	// 작성일		: 2023.02.21
+	// 작성일		: 2023.02.20
 	//
 	// 프로그램 설명: 회원 관리 테스트페이지 입니다.
 	/*******************************************************************/
@@ -68,18 +68,15 @@
 		$res_member = $db -> query_func($qry_member2,1);
 	}
 	//  [ 쿼리 총 갯수 카운트 용도($row_num) ] ===========
-    $where .= ($upart) ? " and r.upart = '{$upart}'": "";
-    $where .= ($utype) ? " and d.utype = '{$utype}'": "";
-    $where .= ($uconame) ? " and d.uconame like '%{$uconame}%'": "";
-    
-    $qry_member3 = "
-		select *
+	$qry_member3 = "
+		select r.uname
 		from  dsp_manage.dsp_member as d, real_manage.real_master as r
-		where d.umaster = r.uid
+		where d.utype like '{$utype}%' 
+			and r.upart like '%{$upart}%' 
+			and d.uconame like '%{$uconame}%'
+			and d.umaster = r.uid
 			and uteam = 3
-			{$where}
 		";
-
 	$res_member = $db -> query_func($qry_member3,1);
 	$row_num = $db -> query_func($res_member,2); // 쿼리 결과 카운트
 
@@ -104,9 +101,12 @@
 	from  dsp_manage.dsp_member as d, real_manage.real_master as r
 	where d.umaster = r.uid
 		and r.uteam = 3
-		{$where}
+		and r.upart like '%{$upart}%'
+		and d.utype like '{$utype}%'
+		and d.uconame like '%{$uconame}%'
 	order by d.last_date desc
-	limit {$start_num}, {$list}";
+	limit {$start_num}, {$list}
+	";
 
 	$res_member = $db -> query_func($qry_member4,1);
 	while(list($m_utype, $uid, $m_uconame, $tot_pay_money, $last_date, $tot_bank_money, $uname, $uteam, $m_upart, $m_uid) = $db -> query_func($res_member,3)){
@@ -115,7 +115,6 @@
 		$ad_balance = number_format($tot_bank_money - $tot_pay_money);
 		$tot_pay_money = number_format($tot_pay_money);
 
-		//	[ NO부여 ] ============
 		if($i<=$row_num){
 			$tr .= "<tr><td>".$i."</td>";
 			$i++;
@@ -142,8 +141,8 @@
 				<td>".$tot_pay_money."</td>
 				<td>".$last_date."</td>
 				<td>".$ad_balance."</td>";
-				//	fn_dsp(담당자id, 담당자 이름, 광고주id, 페이지, 파트, 회원유형, 광고주명)
-				$tr .= "<td><a id='".$m_uid."' class='dsp' onclick=\"fn_dsp('".$m_uid."','".$uname."','".$uid."','".$page."','".$upart."','".$utype."','".$uconame."')\">".$uname."(".$m_uid.")</a></td>";
+				//	fn_dsp(담당자id, 담당자 이름, 광고주id)
+				$tr .= "<td><a id='".$m_uid."' class='dsp' onclick=\"fn_dsp('".$m_uid."','".$uname."','".$uid."')\">".$uname."(".$m_uid.")</a></td>";
 					
 		$tr .= "<td>".$uteam.'-'.$m_upart."</td></tr>";
 				
@@ -179,7 +178,7 @@
 			if($page <= 1){ //만약 page가 1보다 작거나 같다면
 				echo "<li class='color'>처음</li>"; //처음이라는 글자에 색 표시 
 			}else{
-				echo "<li><a onclick='fn_search(1)'>처음</a></li>"; //아니라면 처음글자에 1번페이지로 갈 수있게 링크
+				echo "<li><a onclick='fn_page(1)'>처음</a></li>"; //아니라면 처음글자에 1번페이지로 갈 수있게 링크
 			}
 			if($page <= 1){ //만약 page가 1보다 작거나 같다면 빈값
 				
@@ -189,7 +188,7 @@
 				}else{
 				$pre = $block_start-1; //pre변수를 누르면 현재 페이지보다 이전 block으로 이동
 				}
-				echo "<li><a onclick='fn_search($pre)'><</a></li>"; //이전글자에 pre변수를 링크한다. 이러면 이전버튼을 누를때마다 현재 페이지에서 -1하게 된다.
+				echo "<li><a onclick='fn_page($pre)'><</a></li>"; //이전글자에 pre변수를 링크한다. 이러면 이전버튼을 누를때마다 현재 페이지에서 -1하게 된다.
 			}
 
 			for($i=$block_start; $i<=$block_end; $i++){ 
@@ -198,7 +197,7 @@
 					echo "<li class='color' style='padding: 5px 10px 5px 10px;'>$i</li>"; //현재 페이지에 해당하는 번호에 색을 적용한다
 				}else{
 					//echo "<li><a href='?upart=$upart&utype=$utype&uconame=$uconame&page=$i'onclick='fn_page($i)'>[$i]</a></li>"; //아니라면 $i
-					echo "<li><a onclick='fn_search($i)'>$i</a></li>"; //아니라면 $i
+					echo "<li><a onclick='fn_page($i)'>$i</a></li>"; //아니라면 $i
 				}
 			}
 
@@ -206,12 +205,12 @@
 			
 			}else{
 				$next = $block_end+1; //next를 누르면 현재 페이지 다음 block으로 이동 
-				echo "<li><a onclick='fn_search($next)'>></a></li>"; //다음글자에 next변수를 링크한다. 현재 4페이지에 있다면 +1하여 5페이지로 이동하게 된다.
+				echo "<li><a onclick='fn_page($next)'>></a></li>"; //다음글자에 next변수를 링크한다. 현재 4페이지에 있다면 +1하여 5페이지로 이동하게 된다.
 			}
 			if($page >= $total_page){ //만약 page가 페이지수보다 크거나 같다면
 				echo "<li class='color'>마지막</li>"; //마지막 글자에 색을 적용한다.
 			}else{
-				echo "<li><a onclick='fn_search($total_page)'>마지막</a></li>"; //아니라면 마지막글자에 total_page를 링크한다.
+				echo "<li><a onclick='fn_page($total_page)'>마지막</a></li>"; //아니라면 마지막글자에 total_page를 링크한다.
 			}
 
 ?>
@@ -220,23 +219,22 @@
 
 	<!--- 담당자 설정 modal --->
 	<div id="dialog-message" style="display:none">
-		<p class="title_modal">담당자 설정</p>
+		<p>담당자 설정</p>
 		<hr class="modal_hr">
-		<div class="p_name" id="name"></div>
+		<div id="name"></div>
 		<div>
-		<table border='1'>
-			<tr><th colspan=9 style="color: gray;">DSP</th></tr>
-			<tr>
+			<div>dsp</div>
+			<form>
+				<!--<input type="radio" name="input_check" id="uname" value="현재담당자" onchange="changeType(this)" checked><div id="radio_name"></div></input>-->
 <?
 				for($a=0; $a < count($arr_dsp); $a++){ //array는 count
 					if($a==0){
-						echo '<td class="td"><input type="radio" name="input_check" id="0" value="'.$arr_id[0].'" checked/>'.$arr_dsp[0].'</td>';
+						echo '<input type="radio" name="input_check" id="0" value="'.$arr_id[0].'" onchange="changeType(this)" checked/>'.$arr_dsp[0];
 					}else{
-						echo '<td class="td"><input type="radio" name="input_check" id="'.$a.'" value="'.$arr_id[$a].'"/>'.$arr_dsp[$a].'</td>';
+						echo '<input type="radio" name="input_check" id="'.$a.'" value="'.$arr_id[$a].'" onchange="changeType(this)"/>'.$arr_dsp[$a];
 					}
 				}
 ?>
-			</tr>
-		</table>
+			</form>
 		</div>
 	</div>

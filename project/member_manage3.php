@@ -2,7 +2,7 @@
 	// 프로그램명	: member_manage.php
 	// 제목		: 회원 관리 테스트페이지
 	// 작성자		: 김수현
-	// 작성일		: 2023.02.21
+	// 작성일		: 2023.02.20
 	//
 	// 프로그램 설명: 회원 관리 테스트페이지 입니다.
 	/*******************************************************************/
@@ -36,18 +36,13 @@
 		<script type="text/javascript" src="/shkim/js/jquery-3.2.1.min.js"></script>
 		<script type="text/javascript" src="/shkim/js/jquery-ui.js"></script>
 		<script>
-		// [ 페이지 로드 시 실행되는 함수 ] ======
-        fn_search(1);
-		// [ 조회 버튼, 페이지 버튼 클릭 시 실행되는 함수 ] ======
-		function fn_search(page) {
+		// [ 조회 클릭 시 실행되는 함수 ] ======
+		function fn_search() {
 			let upart = $("#upart").val();
 			let utype = $("#utype").val();
 			let uconame = $("#uconame").val();
-			if(page==null){
-				let page = $("#page").val();
-			}else{
-				
-			}
+			let page = $("#page").val();
+		
 			$.ajax({
 				type: "GET",
 				url: "member_process.php",
@@ -58,6 +53,8 @@
 					page: page,
 				},
 				success: function (data) {
+					//alert("조회 완료");
+					//alert(data);
 					$("#tr").html(data);
 				},
 				error: function (data) {
@@ -66,18 +63,53 @@
 				},
 			});
 		};
+		// [ 페이지 링크 클릭 시 실행되는 함수 ] ======
+		function fn_page(data) {
+			let upart = $("#upart").val();
+			let utype = $("#utype").val();
+			let uconame = $("#uconame").val();
+			let page = data;
+		
+			$.ajax({
+				type: "GET",
+				url: "member_process.php",
+				data: {
+					upart: upart,
+					utype: utype,
+					uconame: uconame,
+					page: page,
+				},
+				success: function (data) {
+					//alert("페이지 리로드");
+					//alert(data);
+                    $("#tr").html(data);
+				},
+				error: function (data) {
+					alert("페이지 로드 실패");
+					consol.log(error);
+				},
+			});
+		};
 		// [ 담당자 링크 클릭 시 실행되는 함수 ] ======
-		function fn_dsp(m_uid, name, uid, page, upart, utype, uconame) {
+		function fn_dsp(m_uid, name, uid) {
+			let upart = $("#upart").val();
+			let utype = $("#utype").val();
+			let uconame = $("#uconame").val();
+			let page = $("#page").val();
+			document.querySelector('#name').innerHTML="현재담당자 :"+name+"<input type='hidden' id='uid' value="+uid+">";
+			//console.log(uid);
 
 			$("#dialog-message").dialog({
 				modal:true,
-				width:800,
-				height:400,
+				width:500,
+				height:500,
 				buttons: {
 					"취소": function() {$(this).dialog('close');},
 					"설정하기": function() {
 						$(this).dialog('close');
+						//let check_id = $("#check").val();
                         let check_id = $("input[name='input_check']:checked").val();
+						let uid = $("#uid").val();
 						let mode = "update";
 						if(m_uid == check_id) {
 							alert("이미 선택된 담당자입니다.");
@@ -96,8 +128,10 @@
 									mode: mode,
 								},
 								success: function (data) {
-									alert("담당자 변경 성공");
-									$("#tr").html(data);
+									alert("담당자 변경 성공"+check_id+uid);
+									//$("#tr").html(data);
+									location.href="http://192.168.3.8/shkim/project/member_manage.php";
+									//alert(data);
 								},
 								error: function (data) {
 									alert("담당자 변경 실패");
@@ -108,7 +142,22 @@
 					},
 				}
 			});
+			//document.querySelector('#radio_name').innerHTML=name;
 		};
+		// [ 라디오버튼 클릭 시 선택값 가져오는 함수 ] ======
+		function changeType(checked){
+			let upart = $("#upart").val();
+			let utype = $("#utype").val();
+			let uconame = $("#uconame").val();
+			let page = $("#page").val();
+			let check_val = $(checked).val();
+			if(check_val==null) check_val = "umind";
+			console.log(check_val);
+			//선택한 담당자 value값(id)을 input value에 담아 member_db.php에 보낸다.
+			document.querySelector('#check_val').innerHTML="<input type='hidden' id= 'check' value='"+check_val+"'/>";
+			//이름도 추가하고싶으면 여기에
+		}
+		
 		</script>
 	</head>
 	<body>
