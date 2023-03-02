@@ -1,135 +1,111 @@
-<?php
-	include $_SERVER['DOCUMENT_ROOT']."/shkim/db.php"; /* db load */
+<?
+//  [ DB connect ] ===========
+$INC_HOME = "../../../../static";
+
+include "$INC_HOME/db_info.rc";
+include "$INC_HOME/dbcon.rc";
+include "$INC_HOME/static_var.rc";
+
+//	[ 회원DB ] ============
+$db = new db_conf("MAINDB_SLV", "fastcampus");
 ?>
 <!doctype html>
 <head>
 	<meta charset="UTF-8">
 	<title>강의자료 게시판</title>
-	<link rel="stylesheet" type="text/css" href="/shkim/css/jquery-ui.css" />
-	<link rel="stylesheet" type="text/css" href="/shkim/css/style.css" />
-	<script type="text/javascript" src="/shkim/js/jquery-3.2.1.min.js"></script>
-	<script type="text/javascript" src="/shkim/js/jquery-ui.js"></script>
-	<script type="text/javascript" src="/shkim/js/common.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../css/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" href="../..//css/style.css" />
+	<script type="text/javascript" src="../../js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui.js"></script>
+	<script type="text/javascript" src="../../js/common.js"></script>
 </head>
 <body>
 <?
 	$bno = $_GET['idx']; /* bno함수에 idx값을 받아와 넣음*/
-	$hit = mysqli_fetch_array(mq("select * from board where idx ='".$bno."'"));
-	$hit = $hit['hit'] + 1;
-	$fet = mq("update board set hit = '".$hit."' where idx = '".$bno."'");
-	$sql = mq("select * from board where idx='".$bno."'"); /* 받아온 idx값을 선택 */
-	$board = $sql->fetch_array();
+	$qry_member1 = "select * from board where idx ='".$bno."'";
+	$res_member = $db -> query_func($qry_member1,1);
+	$hit = $db -> query_func($res_member,3);
+	if($hit['hit']){
+		$hit = $hit['hit'] + 1;
+
+		$qry_member2 = "update board set hit = '".$hit."' where idx = '".$bno."'";
+		$res_member = $db -> query_func($qry_member2,1);
+	}
+	$qry_member3 = "select idx, title, name, regdate, hit, file, content from board where idx='".$bno."'"; /* 받아온 idx값을 선택 */
+	$res_member = $db -> query_func($qry_member3,1);
+	while(list($idx, $title, $name, $regdate, $hit, $file, $content) = $db -> query_func($res_member,3)){
+
 ?>
 	<!-- 글 불러오기 -->
 	<div id="board_read">
-		<h2><a href="/shkim/index.php"><?php echo $board['title']; ?></a></h2>
+		<h2><a href="../../index.php"><?=$title?></a></h2>
 			<div id="user_info">
-				작성자 : <?=$board['name'];?> 작성일 : <?=$board['regdate'];?> 조회 : <?=$board['hit'];?>
+				작성자 : <?=$name?> 작성일 : <?=$regdate?> 조회 : <?=$hit?>
+				<!-- 목록, 수정, 삭제 -->
+				<div id="bo_ser">
+					<a href="./modify.php?idx=<?=$idx?>"><button class="btn_modify">수정</button></a>
+					<a href="../../index.php"><button class="btn_index">목록가기</button></a>
+					<form action="process.php?idx=<?=$idx?>" method="POST" style="float: left;">
+						<button class="btn_delete" type="submit">삭제<button>
+						<input type="hidden" value="delete" name="mode"/>
+					</form>
+				</div>
 				<div id="bo_line"></div>
 			</div>
 			<div>
-			파일 : <a href="../../upload/<?=$board['file'];?>" download><?=$board['file'];?></a>
+			파일 : <a href="../../upload/<?=$file?>" download><?=$file?></a>
 			</div>
 			<div id="bo_content">
 <?			
-			// 'https'라는 문자열이 있는지 검사
-			$pos = strpos($board[content], 'https');
-			if($pos === false){
-				echo nl2br("{$board[content]}");
-			}else{
-				// (URL 자동 링크 변환하기 ==> http, https, ftp, telnet, news, mms를 감지) 새 창으로 열린다.
-				$link = explode("https", $board[content]);
-				for($i=0; $i<count($link); $i++){
-					if($i == 0){
-						
-					}else{ // https기준으로 문자열을 나눴기 때문에 문자열 정렬 기준이 https이다(예외 경우 테스트중). 
-						$linked .= url_auto_link("https{$link[$i]}<br>", true);
-					}
-				}
-				echo $linked;
-			}
-			function url_auto_link($str = '', $popup = false) {
-				if (empty($str)) return false;
-				$target = $popup ? 'target="_blank"' : '';
-				$str = str_replace(array("&lt;", "&gt;", "&amp;", "&quot;", "&nbsp;", "&#039;"),array("\t_lt_\t", "\t_gt_\t", "&", "\"", "\t_nbsp_\t", "'"),$str);
-				$str = preg_replace("/([^(href=\"?'?)|(src=\"?'?)]|\(|^)((http|https|ftp|telnet|news|mms):\/\/[a-zA-Z0-9\.-]+\.[가-힣\xA1-\xFEa-zA-Z0-9\.:&#=_\?\/~\+%@;\-\|\,\(\)]+)/i", "\\1<a   class=\"linked\" href=\"\\2\" {$target}>\\2</A>",$str);
-				$str = preg_replace("/(^|[\"'\s(])(www\.[^\"'\s()]+)/i","\\1<a  class=\"linked\"href=\"http://\\2\" {$target}>\\2</A>",$str);
-				$str = preg_replace("/[0-9a-z_-]+@[a-z0-9._-]{4,}/i","<a class=\"linked\" href=\"mailto:\\0\">\\0</a>",$str);
-				$str = str_replace(array("\t_nbsp_\t", "\t_lt_\t", "\t_gt_\t", "'"),array("&nbsp;", "&lt;", "&gt;", "&#039;"),$str);
-				return $str;
-			}
-	/*
-			// 기존 창에서 열린다.
-			echo nl2br("{$board[content]}")."<br><br>";
-			$pos = strpos($board[content], 'https');
-			if($pos === false){
-				echo nl2br("{$board[content]}");
-			}else{
-				$link = explode("https", $board[content]);
-				for($i=0; $i<count($link); $i++){
-					if($i == 0){
-						
-					}else{
-						$linked .= "<br><a href='https".$link[$i]."' style='color:blue; text-decoration: underline'>https".$link[$i]."</a>";
-					}
-				}
-				echo "<br>".$linked;
-			}
-	*/
+			echo nl2br("{$content}");
+		}
 ?>
-			</div>
-			<!-- 목록, 수정, 삭제 -->
-			<div id="bo_ser">
-				<a href="/shkim/page/board/modify.php?idx=<?php echo $board['idx']; ?>"><button class="btn_modify">수정</button></a>
-				<a href="/shkim/index.php"><button class="btn_index">목록가기</button></a>
-				<form action="process.php?idx=<?php echo $board['idx']; ?>" method="POST" style="float: left;">
-					<button class="btn_delete" type="submit">삭제<button>
-					<input type="hidden" value="delete" name="mode"/>
-				</form>
 			</div>
 		</div>
 		<!--- 댓글 불러오기 -->
 		<div class="reply_view">
 			<h3>댓글목록</h3>
 <?
-			$sql3 = mq("select * from reply where con_num='".$bno."' order by idx desc");
-			while($reply = $sql3->fetch_array()){ 
+			$qry_member4 = "select * from reply where con_num='".$bno."' order by idx desc";
+			$res_member = $db -> query_func($qry_member4,1);
+			$reply = $db -> query_func($res_member,3);
+			if($reply['name']){
 ?>
-			<div class="dap_lo">
-				<div><b><?php echo $reply['name'];?></b></div>
-				<div class="dap_to comt_edit"><?php echo nl2br("$reply[content]"); ?></div>
-				<div class="rep_me dap_to"><?php echo $reply['date']; ?></div>
-				<div class="rep_me rep_menu">
-					<a class="dat_edit_bt" href="#">수정</a>
-					<a class="dat_delete_bt" href="#">삭제</a>
+				<div class="dap_lo">
+					<div><b><?=$reply['name']?></b></div>
+					<div class="dap_to comt_edit"><?php echo nl2br("{$reply['content']}"); ?></div>
+					<div class="rep_me dap_to"><?=$reply['date']?></div>
+					<div class="rep_me rep_menu">
+						<a class="dat_edit_bt" href="#">수정</a>
+						<a class="dat_delete_bt" href="#">삭제</a>
+					</div>
+					<!-- 댓글 수정 폼 dialog -->
+					<div class="dat_edit">
+						<form method="post" action="process.php">
+							<input type="hidden" name="rno" value="<?=$reply['idx']?>" />
+							<input type="hidden" name="b_no" value="<?=$bno?>">
+							<input type="password" name="pw" class="dap_sm" placeholder="비밀번호" />
+							<textarea name="content" class="dap_edit_t"><?=$reply['content']?></textarea>
+							<input type="hidden" value="rep_modify_ok" name="mode"/>
+							<input type="submit" value="수정하기" class="re_mo_bt">
+						</form>
+					</div>
+					<!-- 댓글 삭제 비밀번호 확인 -->
+					<div class='dat_delete'>
+						<form action="process.php" method="post">
+							<input type="hidden" name="rno" value="<?=$reply['idx']?>" />
+							<input type="hidden" name="b_no" value="<?=$bno?>">
+							<input type="hidden" value="reply_delete" name="mode"/>
+							<p>비밀번호<input type="password" name="pw" /> <input type="submit" value="확인"></p>
+						 </form>
+					</div>
 				</div>
-				<!-- 댓글 수정 폼 dialog -->
-				<div class="dat_edit">
-					<form method="post" action="process.php">
-						<input type="hidden" name="rno" value="<?php echo $reply['idx']; ?>" /><input type="hidden" name="b_no" value="<?php echo $bno; ?>">
-						<input type="password" name="pw" class="dap_sm" placeholder="비밀번호" />
-						<textarea name="content" class="dap_edit_t"><?php echo $reply['content']; ?></textarea>
-						<input type="hidden" value="rep_modify_ok" name="mode"/>
-						<input type="submit" value="수정하기" class="re_mo_bt">
-					</form>
-				</div>
-				<!-- 댓글 삭제 비밀번호 확인 -->
-				<div class='dat_delete'>
-					<form action="process.php" method="post">
-						<input type="hidden" name="rno" value="<?php echo $reply['idx']; ?>" />
-						<input type="hidden" name="b_no" value="<?php echo $bno; ?>">
-						<input type="hidden" value="reply_delete" name="mode"/>
-						<p>비밀번호<input type="password" name="pw" /> <input type="submit" value="확인"></p>
-					 </form>
-				</div>
-			</div>
 <? 
 			}
 ?>
-
 			<!--- 댓글 입력 폼 -->
 			<div class="dap_ins">
-				<form action="process.php?idx=<?php echo $bno; ?>" method="post">
+				<form action="process.php?idx=<?=$bno?>" method="post">
 
 					<input type="text" name="dat_user" id="dat_user" class="dat_user" size="15" placeholder="아이디">
 					<input type="password" name="dat_pw" id="dat_pw" class="dat_pw" size="15" placeholder="비밀번호">
