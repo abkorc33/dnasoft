@@ -6,11 +6,11 @@ include "$INC_HOME/db_info.rc";
 include "$INC_HOME/dbcon.rc";
 include "$INC_HOME/static_var.rc";
 
-//	[ 회원DB ] ============
+//	[ testDB ] ============
 $db = new db_conf("MAINDB_SLV", "fastcampus");
 ?>
 
-<link rel="stylesheet" type="text/css" href="../..//css/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="../../css/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="../../css/style.css" />
 <script type="text/javascript" src="../../js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="../../js/jquery-ui.js"></script>
@@ -67,7 +67,7 @@ if($mode=='write'){
 
 		// 패스워드 입력 생략
 		if($username && $title && $content){
-			$qry_member3 = "insert into board(name,title,content,regdate,lock_post,file,masteridx,dragidx) values('".$username."','".$title."','".$content."','".$regdate."','".$lo_post."','".$o_name."','".$masteridx."','".$dragidx."')";
+			$qry_member3 = "insert into board(name,title,content,regdate,lock_post,pw,file,masteridx,dragidx) values('".$username."','".$title."','".$content."','".$regdate."','".$lo_post."',password('".$userpw."'),'".$o_name."','".$masteridx."','".$dragidx."')";
 			$res_member = $db -> query_func($qry_member3,1);
 			echo "<script>
 			alert('글쓰기 완료되었습니다.');

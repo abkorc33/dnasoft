@@ -6,7 +6,7 @@ include "$INC_HOME/db_info.rc";
 include "$INC_HOME/dbcon.rc";
 include "$INC_HOME/static_var.rc";
 
-//	[ 회원DB ] ============
+//	[ testDB ] ============
 $db = new db_conf("MAINDB_SLV", "fastcampus");
 
 if(isset($_GET['page'])){
@@ -185,17 +185,17 @@ if(isset($_GET['page'])){
 
 					if($lock_post=="1"){ 
 ?>
-					<a href='./page/board/ck_read.php?idx=<?=$idx?>'><?php echo $title, $lockimg;
+					<a href='./page/board/ck_read.php?idx=<?=$idx?>'><?php echo $title, $lockimg, $img;
 					} else{ 
 ?>
 					<a href='./page/board/read.php?idx=<?=$idx ?>'><?=$title?><span class="re_ct">[<?=$rep_count ?>]<?=$img ?></span></a></td>
+<?
+					}
+?>
 					<td width="120"><?=$name?></td>
 					<td width="100"><?=$regdate?></td>
 					<td width="100"><?=$hit?></td>
 					<td width="100"><? echo "{$idx} / {$dragidx}" ?></td>
-<?
-					}
-?>
 				</tr>
 <?			
 			}

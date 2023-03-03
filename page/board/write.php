@@ -41,6 +41,14 @@
 		var sHTML = '<span style="color:#FF0000;"><img src="'+filepath+'"></span>';
 		oEditors.getById["editortxt"].exec("PASTE_HTML", [sHTML]);
 	}
+
+	function test(){
+		let checked = $("input[name='lockpost']:checked").val();
+		if(checked==1){
+			document.querySelector('#in_pw').innerHTML='<input type="password" name="pw" id="upw" placeholder="비밀번호"/>';
+			alert("게시글 잠금시 비밀번호가 필요합니다.");
+		}
+	}
 	</script>
 </head>
 <body>
@@ -61,10 +69,10 @@
                         <textarea name="editortxt" id="editortxt" rows="20" cols="10" placeholder="내용을 입력해주세요." style="width: 895px"></textarea>
                     </div>
                     <div id="in_pw">
-                        <input type="password" name="pw" id="upw"  placeholder="비밀번호"/>  
+                    
                     </div>
 					<div id="in_lock">
-                        <input type="checkbox" value="1" name="lockpost" />해당글을 잠급니다.
+                        <input type="checkbox" value="1" name="lockpost" onClick="test()"/>해당글을 잠급니다.
                     </div>
 					<div id="in_file">
                         <input type="file" id="b_file" value="1" name="b_file" />
