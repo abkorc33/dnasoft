@@ -1,20 +1,21 @@
 <?
+header('Content-Type: text/html; charset=utf-8');
 //  [ DB connect ] ===========
-$INC_HOME = "../../../../static";
+$INC_HOME = "../../../include";
 
-include "$INC_HOME/db_info.rc";
-include "$INC_HOME/dbcon.rc";
+include "$INC_HOME/dbcon.rc" ; 
+include "$INC_HOME/common_func.rc";
 include "$INC_HOME/static_var.rc";
 
-//	[ testDB ] ============
-$db = new db_conf("MAINDB_SLV", "fastcampus");
+//	[ 회원DB ] ============
+$db = new db_conf("DSPMAINDB_TEST", "fastcampus");
 ?>
 
-<link rel="stylesheet" type="text/css" href="../../css/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" href="../../css/style.css" />
-<script type="text/javascript" src="../../js/jquery-3.2.1.min.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui.js"></script>
-<script type="text/javascript" src="../../js/common.js"></script>
+<link rel="stylesheet" type="text/css" href="/shkim/css/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="/shkim/css/style.css" />
+<script type="text/javascript" src="/shkim/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="/shkim/js/jquery-ui.js"></script>
+<script type="text/javascript" src="/shkim/js/common.js"></script>
 
 <?
 // POST, GET방식으로 mode값 받음
@@ -42,7 +43,7 @@ if($mode=='write'){
 	$userpw = $_POST['pw'];
 	$title = $_POST['title'];
 	$content = $_POST['editortxt'];
-	$regdate = date('Y-m-d h:i:s');
+	$regdate = date('Y-m-d H:i:s');
 	$masteridx = $_POST['masteridx'];
 	// Auto increament 초기화
 	$qry_member1 = "alter table board auto_increment = 1";
@@ -63,7 +64,7 @@ if($mode=='write'){
 	$qry_member2 = "select max(`dragidx`) as drag from board";
 	$res_member = $db -> query_func($qry_member2,1);
 	while(list($dragidx) = $db -> query_func($res_member,3)){	// 새로 글 작성 후 dragidx제대로 insert 되었는지 확인하기
-	$dragidx = $dragidx + 1;
+		$dragidx = $dragidx + 1;
 
 		// 패스워드 입력 생략
 		if($username && $title && $content){
@@ -71,13 +72,14 @@ if($mode=='write'){
 			$res_member = $db -> query_func($qry_member3,1);
 			echo "<script>
 			alert('글쓰기 완료되었습니다.');
-			location.href='https://realmgrdev.realclick.co.kr/fastcampus/fastcampus_board/index.php';</script>";
+			location.href='/shkim/index.php';</script>";
 		}else{
 			echo "<script>
 			alert('글쓰기에 실패했습니다.');
 			history.back();</script>";
 		}
 	}
+
 }
 
 if($mode=='modify'){
@@ -87,11 +89,11 @@ if($mode=='modify'){
 	$userpw = $_POST['pw'];
 	$title = $_POST['title'];
 	$content = $_POST['editortxt'];
-	$editdate = date('Y-m-d h:i:s');
+	$editdate = date('Y-m-d H:i:s');
 
 	$qry_member1 = "update board set name='".$username."',title='".$title."',content='".$content."',editdate='".$editdate."' where idx='".$bno."'";
 	$res_member = $db -> query_func($qry_member1,1);
-	echo "<script>alert('수정이 완료되었습니다.'); location.href='./read.php?idx={$bno}';</script>";
+	echo "<script>alert('수정이 완료되었습니다.'); location.href='/shkim/page/board/read.php?idx={$bno}';</script>";
 	/*,pw=password('".$userpw."')
 	파일삭제 unlink()로 파일삭제*/
 }
@@ -101,7 +103,7 @@ if($mode=='delete'){
 	$bno = $_GET['idx'];
 	$qry_member1 = "delete from board where idx={$bno}";
 	$res_member = $db -> query_func($qry_member1,1);
-	echo "<script>alert('삭제되었습니다.'); location.href='../../index.php';</script>";
+	echo "<script>alert('삭제되었습니다.'); location.href='/shkim/index.php';</script>";
 	// a태그 형식에서 form 태그 형식으로 데이터 전송 방식 수정
 }
 
@@ -109,7 +111,7 @@ if($mode=='reply_ok'){
 
 	$bno = $_GET['idx'];
     $userpw = $_POST['dat_pw'];
-	$date = date('Y-m-d h:i');
+	$date = date('Y-m-d H:i');
 	// Auto increament 초기화
 	$qry_member1 = "alter table reply auto_increment = 1";
 	$res_member = $db -> query_func($qry_member1,1);
@@ -118,7 +120,7 @@ if($mode=='reply_ok'){
         $qry_member2 = "insert into reply(con_num,name,pw,content,date) values('".$bno."','".$_POST['dat_user']."',password('".$userpw."'),'".$_POST['content']."','".$date."')";
 		$res_member = $db -> query_func($qry_member2,1);
         echo "<script>alert('댓글이 작성되었습니다.'); 
-        location.href='./read.php?idx=$bno';</script>";
+        location.href='/shkim/page/board/read.php?idx=$bno';</script>";
     }else{
         echo "<script>alert('댓글 작성에 실패했습니다.'); 
         history.back();</script>";
@@ -139,7 +141,7 @@ if($mode=='rep_modify_ok'){
 		$qry_member2 = "update reply set content='".$content."' where idx='".$rno."'";
 		$res_member = $db -> query_func($qry_member2,1);
 ?>
-        <script type="text/javascript">alert('댓글이 수정되었습니다.'); location.replace("./read.php?idx=<?php echo $bno; ?>");</script>
+        <script type="text/javascript">alert('댓글이 수정되었습니다.'); location.replace("/shkim/page/board/read.php?idx=<?php echo $bno; ?>");</script>
 <?  }else{ ?>
         <script type="text/javascript">alert('비밀번호가 틀립니다');history.back();</script>
 <?
@@ -160,7 +162,7 @@ if($mode=='reply_delete'){
         $qry_member2 = "delete from reply where idx='".$rno."'"; 
 		$res_member = $db -> query_func($qry_member2,1);
 ?>
-        <script type="text/javascript">alert('댓글이 삭제되었습니다.'); location.replace("./read.php?idx=<?php echo $bno; ?>");</script>
+        <script type="text/javascript">alert('댓글이 삭제되었습니다.'); location.replace("/shkim/page/board/read.php?idx=<?php echo $bno; ?>");</script>
 <?  }else{ ?>
         <script type="text/javascript">alert('비밀번호가 틀립니다');history.back();</script>
 <?
