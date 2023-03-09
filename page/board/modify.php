@@ -7,7 +7,8 @@ include "$INC_HOME/dbcon.rc";
 include "$INC_HOME/static_var.rc";
 
 //	[ testDB ] ============
-$db = new db_conf("MAINDB_SLV", "fastcampus");
+//$db = new db_conf("MAINDB_SLV", "fastcampus");
+$db = new db_conf("TESTSERVER", "fastcampus");
 
 $bno = $_GET['idx'];
 
