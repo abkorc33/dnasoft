@@ -78,7 +78,6 @@ $db = new db_conf("TESTSERVER", "fastcampus");
 	<!--- 댓글 불러오기 -->
 	<div id="pc_mo">
 		<h3>댓글목록</h3>
-		
 <?
 		$qry_member4 = "select * from reply where con_num='".$bno."' order by idx desc";
 		$res_member = $db -> query_func($qry_member4,1);
