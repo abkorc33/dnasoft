@@ -1,4 +1,4 @@
-package org.example;
+package org.example.cooking;
 
 public class Cooking {
     public Cook makeCook(MenuItem menuItem) {

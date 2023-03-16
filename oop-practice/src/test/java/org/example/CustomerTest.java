@@ -1,5 +1,9 @@
 package org.example;
 
+import org.example.cooking.Cooking;
+import org.example.cooking.Customer;
+import org.example.cooking.Menu;
+import org.example.cooking.MenuItem;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.cooking;
 
 public class Customer {
     public void order(String menuName, Menu menu, Cooking cooking){
