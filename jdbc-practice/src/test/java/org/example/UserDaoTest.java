@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserDaoTest {
 
-    @BeforeEach
+    @BeforeEach // 테스트 코드를 실행하기에 앞서 수행해야하는 작업이 있는경우 해당 메소드에 작성하는 어노테이션
     void setUp() {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(new ClassPathResource("db_schema.sql"));
