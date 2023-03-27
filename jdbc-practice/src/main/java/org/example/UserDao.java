@@ -8,7 +8,7 @@ public class UserDao {
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
 
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
-        jdbcTemplate.executeUpdate(sql, pstmt -> {
+        jdbcTemplate.executeUpdate(sql, pstmt -> { // PreparedStatementSetter 의 setter 메소드 부분을 인자로 사용해야 했기 때문에 이를 람다로 구현한 것
             pstmt.setString(1, user.getUserId());
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getName());

@@ -21,7 +21,7 @@ public class ConnectionManager {
         hikariDataSource.setJdbcUrl(DB_URL);
         hikariDataSource.setUsername(DB_USERNAME);
         hikariDataSource.setPassword(DB_PW);
-        hikariDataSource.setMaximumPoolSize(MAX_POOL_SIZE);
+        hikariDataSource.setMaximumPoolSize(MAX_POOL_SIZE); // 커넥션 수 설정 메서드(WAS 스레드 수 고려)
         hikariDataSource.setMinimumIdle(MAX_POOL_SIZE);
 
         ds = hikariDataSource;
