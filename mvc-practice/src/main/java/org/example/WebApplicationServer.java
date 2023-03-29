@@ -2,9 +2,9 @@ package org.example;
 
 import org.apache.catalina.startup.Tomcat;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import org.slf4j.LoggerFactory;
 
 public class WebApplicationServer {
     private static final Logger log = LoggerFactory.getLogger(WebApplicationServer.class);
@@ -20,4 +20,5 @@ public class WebApplicationServer {
         tomcat.start();
         tomcat.getServer().await();
     }
+    
 }
