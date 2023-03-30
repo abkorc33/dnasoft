@@ -20,7 +20,7 @@ import java.util.List;
 public class DispatcherServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DispatcherServlet.class);
 
-    private List<HandlerMapping> handlerMappings;
+    private List<HandlerMapping> handlerMappings; // 리스트로 받아오는 이유
 
     private List<HandlerAdapter> handlerAdapters;
 
@@ -28,14 +28,14 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init() {
-        RequestMappingHandlerMapping rmhm = new RequestMappingHandlerMapping();
-        rmhm.init();
+        RequestMappingHandlerMapping rmhm = new RequestMappingHandlerMapping(); // 객체 생성
+        rmhm.init(); // 초기화 => 톰캣이 httpservlet을 singletone(객체 한개)으로 만드는데, 이때 init()이 호출된다.
 
         AnnotationHandlerMapping ahm = new AnnotationHandlerMapping("org.example");
         ahm.initialize();
 
-        handlerMappings = List.of(rmhm, ahm);
-        handlerAdapters = List.of(new SimpleControllerHandlerAdapter(), new AnnotationHandlerAdapter());
+        handlerMappings = List.of(rmhm, ahm); // 리스트로 받아오는 이유
+        handlerAdapters = List.of(new SimpleControllerHandlerAdapter(), new AnnotationHandlerAdapter()); // 어댑터 두개
         viewResolvers = Collections.singletonList(new JspViewResolver());
     }
 
@@ -44,6 +44,8 @@ public class DispatcherServlet extends HttpServlet {
         String requestURI = request.getRequestURI();
         RequestMethod requestMethod = RequestMethod.valueOf(request.getMethod());
 
+        // 요청 uri에 대한 작업을 위임한다. => 처리할 핸들러를 달라
+        // 컨트롤러 인터페이스가 아닌 어노테이션으로 리퀘스트를 받기 위해서 object handler
         Object handler = handlerMappings.stream()
                 .filter(hm -> hm.findHandler(new HandlerKey(requestURI, requestMethod)) != null)
                 .map(hm -> hm.findHandler(new HandlerKey(requestURI, requestMethod)))
@@ -52,8 +54,9 @@ public class DispatcherServlet extends HttpServlet {
 
         try {
             HandlerAdapter handlerAdapter = handlerAdapters.stream()
-                    .filter(ha -> ha.supports(handler))
-                    .findFirst()
+                    .filter(ha -> ha.supports(handler)) // 전달받은 핸들러를 지원하는거면
+                    .findFirst() // 찾아라
+                    // 찾을 수 없으면 예외 던져라
                     .orElseThrow(() -> new ServletException("No adapter for handler [" + handler + "]"));
 
             ModelAndView modelAndView = handlerAdapter.handle(request, response, handler);
