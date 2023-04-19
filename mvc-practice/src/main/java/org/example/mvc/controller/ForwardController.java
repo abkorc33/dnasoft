@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class ForwardController implements Controller {
+    // 해당하는 경로로 이동하는 컨트롤러
     private String forwardUrl;
 
     public ForwardController(String forwardUrl) {

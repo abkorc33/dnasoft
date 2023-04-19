@@ -1,15 +1,12 @@
 package org.example.calculator.domain;
 
-import org.example.calculator.tobe.AdditionOperator;
-import org.example.calculator.tobe.ArithmeticOperator;
-import org.example.calculator.tobe.DivisionOperator;
-import org.example.calculator.tobe.SubtractionOperator;
+import org.example.calculator.tobe.*;
 
 import java.util.List;
 
 public class Calculator {
 
-    private static final List<ArithmeticOperator> arithmeticOperators = List.of(new AdditionOperator(), new DivisionOperator(), new SubtractionOperator());
+    private static final List<ArithmeticOperator> arithmeticOperators = List.of(new AdditionOperator(), new DivisionOperator(), new SubtractionOperator(), new MultiplicationOperator());
     /**
      * 간단한 사칙연산을 할 수 있다.
      * 양수로만 계산할 수 있다.
