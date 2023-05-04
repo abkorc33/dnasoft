@@ -1,0 +1,49 @@
+# spring boot의 각종 디버그 볼거냐
+debug: false
+
+#엑츄에이터: 스프링 부트 애플리케이션에서 제공하는 여러가지 정보를 모니터링하기 쉽게 해주는 기능,
+#엑츄에이터의 감춰진 기능을 모두 활성화 시키는 것.
+management.endpoints.web.exposure.include: "*"
+
+#debug false로 하는 대신 보고싶은 로그들
+logging:
+  level:
+    fastcampus.projectboard: debug
+
+    #    request response 로그
+    org.springframework.web.servlet: debug
+    #    쿼리 ? 로 나오는거 실제 값 관찰
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/board
+    username: board
+    password: 1111
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    defer-datasource-initialization: true
+    hibernate.ddl-auto: create
+    show-sql: true
+
+    #    추가 프로퍼티로 jpa 구현체에 종속된 프로퍼티 따로 설정가능. spring 에서지원해주지 않는 구현체 전용 프로퍼티는 이렇게 사용 가능.
+    properties:
+      #      디버그 쿼리문 정리
+      hibernate.format_sql: true
+      hibernate.default_batch_fetch_size: 100
+  #      h2 웹에서보는거
+  h2.console.enabled: true
+  #  data.sql을 언제 작동시킬 것인지.
+  sql.init.mode: always
+
+#yaml은 ---로 문서를 여러개 만들 수 ㅇ
+---
+#doc 2. 특정 프로파일에 작동하는 spring
+#testdb가 activate 되었을 때 이 문서를 읽는다.
+#spring:
+#  config.activate.on-profile: testdb
+#  datasource:
+#    url: jdbc:h2:mem:board;mode=mysql
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#  jpa.hibernate.ddl-auto: create
+#  sql.init.mode: always
